@@ -1,0 +1,118 @@
+// ==========================
+// Data klasa
+// ==========================
+data class Aplikacija(
+    var imeAplikacije: String,
+    var kategorija: String = "",
+    var brojPreuzimanja: Int,
+    var prosjOcjena: Double,
+    var velicinaUMB: Int
+) {
+    init {
+        require(imeAplikacije.isNotBlank()) { "Ime aplikacije ne smije biti prazno!" }
+        require(kategorija.isNotBlank()) { "Aplikacija mora imati navedenu kategoriju!" }
+        require(brojPreuzimanja >= 0) { "Broj preuzimanja ne može biti negativan!" }
+        require(prosjOcjena >= 0.0) { "Prosječna ocjena mora biti nenegativna!" }
+        require(velicinaUMB >= 0) { "Veličina filea ne može biti negativna!" }
+    }
+}
+
+fun filtrirajPoOcjeni(aplikacije: List<Aplikacija>, granica: Double): List<Aplikacija> {
+    val rezultat = mutableListOf<Aplikacija>()
+    for (app in aplikacije) {
+        if (app.prosjOcjena > granica) {
+            rezultat.add(app)
+        }
+    }
+    return rezultat
+}
+
+fun filtrirajPoOcjeniLambda(aplikacije: List<Aplikacija>, granica: Double): List<Aplikacija> {
+    return aplikacije.filter { it.prosjOcjena > granica }
+}
+
+fun grupisiPoKategoriji(aplikacije: List<Aplikacija>): Map<String, Int> {
+    val mapa = mutableMapOf<String, Int>()
+    for (app in aplikacije) {
+        mapa[app.kategorija] = (mapa[app.kategorija] ?: 0) + 1
+    }
+    return mapa
+}
+
+fun grupisiPoKategorijiGroupBy(aplikacije: List<Aplikacija>): Map<String, Int> {
+    return aplikacije.groupingBy { it.kategorija }.eachCount()
+}
+
+fun sortirajPoPreuzimanjima(aplikacije: List<Aplikacija>): List<Aplikacija> {
+    return aplikacije.sortedByDescending { it.brojPreuzimanja }
+}
+
+fun prosjecnaVelicinaPoKategoriji(aplikacije: List<Aplikacija>): Map<String, Double> {
+    return aplikacije.groupBy { it.kategorija }
+        .mapValues { (_, lista) ->
+            lista.map { it.velicinaUMB }.average()
+        }
+}
+
+fun pretraziPoImenu(aplikacije: List<Aplikacija>, ime: String): Aplikacija? {
+    return aplikacije.find { it.imeAplikacije.equals(ime, ignoreCase = true) }
+}
+
+fun ispisiAplikacije(aplikacije: List<Aplikacija>) {
+    for (app in aplikacije) {
+        println("App: ${app.imeAplikacije} | Category: ${app.kategorija} | Rating: ${app.prosjOcjena} | Downloads: ${app.brojPreuzimanja} | Size: ${app.velicinaUMB}MB")
+    }
+}
+
+fun main() {
+    val aplikacije = listOf(
+        Aplikacija("Bugdet Tracker", "Produktivnost", 154, 4.5, 167),
+        Aplikacija("NBA 2K25", "Igrice", 1005, 4.8, 353),
+        Aplikacija("Physics Tutor", "Edukacija", 52, 3.5, 112),
+        Aplikacija("Life Advice", "Život i zdravlje", 456, 4.1, 451),
+        Aplikacija("Workout Coach", "Život i zdravlje", 390, 4.6, 1128),
+        Aplikacija("Phone Usage", "Produktivnost", 693, 2.4, 253),
+        Aplikacija("FIFA 25", "Igrice", 1137, 5.0, 784),
+        Aplikacija("Electrical Engineer Help", "Edukacija", 352, 4.8, 767),
+        Aplikacija("Steps Walked", "Život i zdravlje", 2076, 3.9, 67),
+        Aplikacija("Talking Tom", "Igrice", 3774, 4.8, 1126)
+    )
+
+    println("=== Filtriranje po ocjeni > 4.5 ===")
+    val filtrirane = filtrirajPoOcjeni(aplikacije, 4.5)
+    ispisiAplikacije(filtrirane)
+
+    println("\n=== Filtriranje sa lambda (ocjena > 4.5) ===")
+    val filtriraneLambda = filtrirajPoOcjeniLambda(aplikacije, 4.5)
+    ispisiAplikacije(filtriraneLambda)
+
+    println("\n=== Grupisanje po kategoriji (manual) ===")
+    val grupisane = grupisiPoKategoriji(aplikacije)
+    println(grupisane)
+
+    println("\n=== Grupisanje po kategoriji (groupingBy) ===")
+    val grupisane2 = grupisiPoKategorijiGroupBy(aplikacije)
+    println(grupisane2)
+
+    println("\n=== Sortiranje po broju preuzimanja ===")
+    val sortirane = sortirajPoPreuzimanjima(aplikacije)
+    ispisiAplikacije(sortirane)
+
+    println("\n=== Prosječna veličina po kategoriji ===")
+    val prosjVel = prosjecnaVelicinaPoKategoriji(aplikacije)
+    println(prosjVel)
+
+    println("\n=== Pretraga po imenu ===")
+    val trazena = pretraziPoImenu(aplikacije, "NBA 2K25")
+    if (trazena != null) {
+        ispisiAplikacije(listOf(trazena))
+    } else {
+        println("Aplikacija nije pronađena.")
+    }
+
+    println("\n=== Provjere ===")
+    println("Filtriranje test: svi >4.5? " + filtrirane.all { it.prosjOcjena > 4.5 })
+    println("Grupisanje test: suma po kategorijama = broj aplikacija? " +
+            (grupisane.values.sum() == aplikacije.size))
+    println("Pretraga test: ime = NBA 2K25? " + (trazena?.imeAplikacije == "NBA 2K25"))
+}

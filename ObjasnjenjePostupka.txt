@@ -1,0 +1,30 @@
+# Android Aplikacije - Kotlin Konsolna Simulacija
+
+## Opis projekta
+
+Ovaj projekat simulira kolekciju Android aplikacija koristeći **Kotlin**.  Odlučio sam se za zadatak C.
+Cilj je prikazati rad sa kolekcijama, filtriranje, grupisanje, sortiranje i pretragu podataka, što se kasnije može koristiti u **Android aplikaciji** (npr. RecyclerView).
+
+---
+
+## Data klasa: `Aplikacija`
+
+Klasa predstavlja jednu aplikaciju sa sljedećim atributima:
+
+| Atribut | Tip | Opis | Validacija |
+|---------|-----|------|-----------|
+| `imeAplikacije` | `String` | Naziv aplikacije | Ne smije biti prazno |
+| `kategorija` | `String` | Kategorija aplikacije (npr. "Igrice", "Produktivnost") | Ne smije biti prazno |
+| `brojPreuzimanja` | `Int` | Broj preuzimanja aplikacije | Ne smije biti negativan |
+| `prosjOcjena` | `Double` | Prosječna ocjena aplikacije | Ne smije biti negativna |
+| `velicinaUMB` | `Int` | Veličina aplikacije u MB | Ne smije biti negativna |
+
+**Napomena:** Validacija se vrši u `init` bloku klase pomoću `require()` funkcije, tako da se odmah sprječava kreiranje nevalidnih objekata.
+
+---
+
+## Funkcije i objašnjenje rada
+
+### 1. `filtrirajPoOcjeni`
+```kotlin
+fun filtrirajPoOcjeni(aplikacije: List<Aplikacija>, granica: Double): List<Aplikacija>
